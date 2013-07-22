@@ -47,8 +47,14 @@ class Board
 
   # this is bad form, p in to_s method
   def to_s
-    @grid.dup.each do |row|
-      p row.map(&:to_s)
+    new_board = @grid.dup.map do |row|
+       row.map do |elem|
+        elem.revealed? ? elem.to_s : "#"
+      end
+    end
+
+    new_board.each do |row|
+      p row
     end
   end
 end
