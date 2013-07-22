@@ -1,3 +1,24 @@
+class Minesweeper
+  def initialize
+    @board = Board.new
+  end
+
+  def play
+    puts "Welcome to Minesweeper!"
+
+    until false
+      puts @board
+      puts "What square do you want to reveal?"
+      pos = gets.chomp.split(' ').map(&:to_i)
+      if @board[pos].bomb?
+        return "You lost!"
+      else
+        @board.reveal_neighbors(pos)
+      end
+    end
+  end
+end
+
 # This is a minesweeper game for command line
 class Board
   def initialize
@@ -42,6 +63,19 @@ class Board
 
     all_positions.each do |pos|
       self[pos].calculate_bomb_count
+    end
+  end
+
+  # Where should this be?
+  def reveal_neighbors(pos)
+    unless self[pos].bomb_count == 0
+      self[pos].reveal
+      return
+    end
+    self[pos].reveal
+    self[pos].adjacent_tiles.each do |neighbor|
+      next if neighbor.revealed?
+      reveal_neighbors(neighbor.position)
     end
   end
 
@@ -108,6 +142,10 @@ class Tile
 
   def revealed?
     @revealed
+  end
+
+  def reveal
+    @revealed = true
   end
 
   def to_s
