@@ -6,24 +6,30 @@ class Minesweeper
   def play
     puts "Welcome to Minesweeper!"
 
-    until false
+    until @board.won?
       puts @board
       puts "What square do you want to reveal?"
       pos = gets.chomp.split(' ').map(&:to_i)
       if @board[pos].bomb?
-        return "You lost!"
+        @board.reveal_all
+        puts "You lost!"
+        puts @board
       else
         @board.reveal_neighbors(pos)
       end
     end
+
+    puts "yay."
+    @board.reveal_all
+    puts @board
   end
+
 end
 
 # This is a minesweeper game for command line
 class Board
   def initialize
     @grid = (0...9).map { |row| [nil] * 9 }
-    @bomb_positions = bomb_positions
     populate_grid
   end
 
@@ -51,6 +57,10 @@ class Board
     all_positions.sample(10)
   end
 
+  def place_flag(pos)
+    @grid[pos].flag
+  end
+
   # Refactor
   def populate_grid
     all_positions.each do |pos|
@@ -63,6 +73,16 @@ class Board
 
     all_positions.each do |pos|
       self[pos].calculate_bomb_count
+    end
+  end
+
+  def remove_flag(pos)
+    @grid[pos].remove_flag
+  end
+
+  def reveal_all
+    all_positions.each do |pos|
+      self[pos].reveal
     end
   end
 
@@ -83,12 +103,24 @@ class Board
   def to_s
     new_board = @grid.dup.map do |row|
        row.map do |elem|
-        elem.revealed? ? elem.to_s : "#"
+        if elem.revealed?
+          elem.to_s
+        elsif elem.flagged?
+          "F"
+        else
+           "#"
+        end
       end
     end
 
     new_board.each do |row|
       p row
+    end
+  end
+
+  def won?
+    (all_positions - bomb_positions).all? do |pos|
+      self[pos].revealed?
     end
   end
 end
@@ -136,8 +168,16 @@ class Tile
     end
   end
 
+  def flag
+    @flagged = true
+  end
+
   def flagged?
     @flag
+  end
+
+  def remove_flag
+    @flagged = false
   end
 
   def revealed?
