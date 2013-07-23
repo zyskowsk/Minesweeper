@@ -8,8 +8,8 @@ require './board.rb'
 class Minesweeper
   attr_reader :board
 
-  def initialize
-    @board = Board.new
+  def initialize(size)
+    @board = Board.new(size)
   end
 
   def click_square(pos)
@@ -89,8 +89,8 @@ class Minesweeper
   end
   
   def valid_move?(input)
-    leave_game = (input.first == 'quit' || input.first == 'save')
-    return input if leave_game
+    leaving_game = (input.first == 'quit' || input.first == 'save')
+    return input if leaving_game
     coordinates = get_coordinates(input)
     (2..3).include?(input.length) &&
     @board.on_board?(coordinates) &&
@@ -106,6 +106,8 @@ class Minesweeper
 end
 
 if __FILE__ == $PROGRAM_NAME
-  game = Minesweeper.new
+  puts "Would you like to play on a small or large board? ('small'/'large')"
+  size = gets.chomp
+  game = Minesweeper.new(size)
   game.play
 end

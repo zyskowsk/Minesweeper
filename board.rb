@@ -1,7 +1,8 @@
 class Board
   
-  def initialize
-    @grid = (0...9).map { |row| [nil] * 9 }
+  def initialize(size)
+    @size = parse_size(size)
+    @grid = (0...@size).map { |row| [nil] * @size }
     @bomb_positions = bomb_positions
     populate_grid
   end
@@ -23,8 +24,8 @@ class Board
   def all_positions
     all_positions = []
 
-    (0...9).each do |i|
-      (0...9).each do |j|
+    (0...@size).each do |i|
+      (0...@size).each do |j|
         all_positions << [i, j]
       end
     end
@@ -33,11 +34,17 @@ class Board
   end
   
   def bomb_positions
-    all_positions.sample(10)
+    num_bombs = (@size == 9 ? 10 : 40)
+    all_positions.sample(num_bombs)
+  end
+  
+  def parse_size(size)
+    return 9 if size == 'small'
+    return 16 if size == 'large'
   end
 
   def on_board?(pos)
-    (0...9).include?(pos.first) && (0...9).include?(pos.last)
+    (0...@size).include?(pos.first) && (0...@size).include?(pos.last)
   end
   
   def place_tile(pos)
@@ -78,7 +85,7 @@ class Board
     rows_string = ""
     
     stringify_tiles.each_with_index do |row, i|
-      rows_string += (" " * 6) + "#{i} ".colorize(:cyan) + row.join(" ") + "\n"
+      rows_string += "#{i} ".colorize(:cyan) + row.join(" ") + "\n"
     end
     
     rows_string  
@@ -98,17 +105,18 @@ class Board
     end
   end
 
+  # Fix to string for large board
   def to_s
     top_row_string + rows_string
   end
   
   def top_row_string
     top_row = ""
-    (0...9).each do |i|
+    (0...@size).each do |i|
       top_row += " #{i}".colorize(:cyan) 
     end
     
-    (" " * 7) + top_row + "\n"
+    " " + top_row + "\n"
   end
 
   def won?
