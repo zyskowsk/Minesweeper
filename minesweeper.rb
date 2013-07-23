@@ -1,4 +1,5 @@
 require 'yaml'
+require 'colorize'
 load './tile.rb'
 load './board.rb'
 

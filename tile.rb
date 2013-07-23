@@ -57,7 +57,13 @@ class Tile
   end
 
   def to_s
-    bomb? ? '*' : @bomb_count.to_s
+    colors = {1 => :light_green,
+              2 => :light_yellow,
+              3 => :light_magenta,
+              4 => :magenta}
+    return '*'.colorize(:red) if bomb
+    return '-'.colorize(:white) if @bomb_count == 0
+    return @bomb_count.to_s.colorize(colors[@bomb_count]) if @bomb_count > 0
   end
   
   def toggle_flag

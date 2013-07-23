@@ -73,6 +73,16 @@ class Board
       reveal_neighbors(neighbor.position)
     end
   end
+
+  def rows_string
+    rows_string = ""
+    
+    stringify_tiles.each_with_index do |row, i|
+      rows_string += "#{i} ".colorize(:cyan) + row.join(" ") + "\n"
+    end
+    
+    rows_string  
+  end
   
   def stringify_tiles
     @grid.dup.map do |row|
@@ -82,28 +92,23 @@ class Board
         elsif elem.flagged?
           "F"
         else
-          "█▌"
+          "▨"
         end
       end
     end
   end
 
-  # this is bad form, p in to_s method
   def to_s
-    stringified_board = self.stringify_tiles
-
-    stringified_board.each do |row|
-      p row
-    end
+    top_row_string + rows_string
   end
   
   def top_row_string
     top_row = ""
     (0...9).each do |i|
-      top_row += " " + i.to_s 
+      top_row += " #{i}".colorize(:cyan) 
     end
     
-    top_row + "\n " + "-" * 17
+    " " + top_row + "\n"
   end
 
   def won?
