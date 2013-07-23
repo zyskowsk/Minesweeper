@@ -1,35 +1,90 @@
+require 'yaml'
+
 class Minesweeper
+  attr_reader :board
+
   def initialize
     @board = Board.new
   end
 
+  def click_square(pos)
+    if @board[pos].bomb?
+      @board.reveal_all
+      puts "You lost!"
+      puts @board
+    elsif @board.won?
+      puts "yay."
+      @board.reveal_all
+      puts @board
+    else
+      @board.reveal_neighbors(pos)
+    end
+  end
+
   def play
     puts "Welcome to Minesweeper!"
+    puts "To save your game, enter 'save.'"
 
     until @board.won?
       puts @board
       puts "What square do you want to reveal?"
-      pos = gets.chomp.split(' ').map(&:to_i)
-      if @board[pos].bomb?
-        @board.reveal_all
-        puts "You lost!"
-        puts @board
-      else
-        @board.reveal_neighbors(pos)
-      end
-    end
+      puts "Or type 'F x y' to flag a position."
+      input = get_input
 
-    puts "yay."
-    @board.reveal_all
-    puts @board
+      if input.first.to_s.downcase == 'save'
+        save_game(input.last)
+        puts "Game saved!"
+        return
+      end
+
+      play_turn(input)
+    end
   end
 
+  def get_input
+    input = gets.chomp.split(' ')
+    return input if input.first.downcase == 'save'
+
+    pos = input.map(&:to_i)
+    coordinates = pos[-2..-1]
+    while !(2..3).include?(pos.length) || @board[coordinates].revealed? ||
+      !@board.on_board?(coordinates)
+      puts "Not a valid move; please try again!"
+      pos = gets.chomp.split(' ').map(&:to_i)
+      coordinates = pos[-2..-1]
+    end
+
+    pos
+  end
+
+  def self.load(file)
+    file_contents = File.read(file)
+
+    game = YAML.load(file_contents)
+    game.play
+  end
+
+  def play_turn(input)
+
+    if input.length == 2
+      click_square(input)
+    else
+      @board.toggle_flag(input[1..-1])
+    end
+  end
+
+  def save_game(file)
+    File.open(file, 'w') do |f|
+      f.puts self.to_yaml
+    end
+  end
 end
 
 # This is a minesweeper game for command line
 class Board
   def initialize
     @grid = (0...9).map { |row| [nil] * 9 }
+    @bomb_positions = bomb_positions
     populate_grid
   end
 
@@ -53,18 +108,14 @@ class Board
     all_positions
   end
 
-  def bomb_positions
-    all_positions.sample(10)
-  end
-
-  def place_flag(pos)
-    @grid[pos].flag
+  def on_board?(pos)
+    (0...9).include?(pos.first) && (0...9).include?(pos.last)
   end
 
   # Refactor
   def populate_grid
     all_positions.each do |pos|
-      if bomb_positions.include?(pos)
+      if @bomb_positions.include?(pos)
         self[pos] = Tile.new(true, pos, self)
       else
         self[pos] = Tile.new(false, pos, self)
@@ -74,10 +125,6 @@ class Board
     all_positions.each do |pos|
       self[pos].calculate_bomb_count
     end
-  end
-
-  def remove_flag(pos)
-    @grid[pos].remove_flag
   end
 
   def reveal_all
@@ -118,8 +165,13 @@ class Board
     end
   end
 
+  def toggle_flag(pos)
+    tile = self[pos]
+    tile.flagged? ? tile.remove_flag : tile.flag
+  end
+
   def won?
-    (all_positions - bomb_positions).all? do |pos|
+    (all_positions - @bomb_positions).all? do |pos|
       self[pos].revealed?
     end
   end
@@ -127,11 +179,11 @@ end
 
 class Tile
   attr_reader :bomb_count, :position
-  attr_accessor :bomb
+  attr_accessor :bomb, :revealed
 
   def initialize(bomb = false, position, board)
     @bomb = bomb
-    @flag = false #delete?
+    @flagged = false #delete?
     @revealed = false #delete?
     @position = position
     @board = board
@@ -150,7 +202,9 @@ class Tile
       x = pos.first
       y = pos.last
 
-      if (0...9).include?(current_x + x) && (0...9).include?(current_y + y)
+      new_pos = [current_x + x, current_y + y]
+
+      if @board.on_board?(new_pos)
         adjacent_tiles << @board[[current_x + x, current_y + y]]
       end
     end
@@ -173,7 +227,7 @@ class Tile
   end
 
   def flagged?
-    @flag
+    @flagged
   end
 
   def remove_flag
