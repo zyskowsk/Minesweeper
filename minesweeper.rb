@@ -4,12 +4,15 @@ require 'yaml'
 require 'colorize'
 require './tile.rb'
 require './board.rb'
+require './highscores.rb'
 
 class Minesweeper
   attr_reader :board
 
   def initialize(size)
     @board = Board.new(size)
+    high_scores = Minesweeper.load_high_scores
+    @high_scores = high_scores ? high_scores : ScoreBoard.new
   end
 
   def click_square(pos)
@@ -31,8 +34,9 @@ class Minesweeper
   end
 
   def play
-    welcom_message
+    welcome_message
 
+    start = Time.now
     until @board.won?
       puts @board
       input = get_input
@@ -47,6 +51,10 @@ class Minesweeper
  
       play_turn(input)
     end
+    finish = Time.now
+    time = finish - start
+    p @high_scores
+    @high_scores.add_score(time)
   end
 
   def get_coordinates(input)
@@ -73,6 +81,11 @@ class Minesweeper
     game = YAML.load(file_contents)
     game.play
   end
+  
+  def self.load_high_scores
+    high_scores = File.read("high_scores")
+    YAML.load(high_scores)
+  end
 
   def play_turn(input)
     if input.length == 2
@@ -97,7 +110,7 @@ class Minesweeper
     @board[coordinates].hidden? 
   end
   
-  def welcom_message
+  def welcome_message
     puts ("=" * 34).colorize(:blue)
     puts "Welcome to Minesweeper!".colorize(:magenta)
     puts "To save your game, enter 'save.'".colorize(:magenta)
