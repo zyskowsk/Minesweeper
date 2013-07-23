@@ -4,7 +4,7 @@ require 'yaml'
 require 'colorize'
 require './tile.rb'
 require './board.rb'
-require './highscores.rb'
+require './scoreboard.rb'
 
 class Minesweeper
   attr_reader :board
