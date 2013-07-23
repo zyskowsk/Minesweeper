@@ -24,9 +24,11 @@ class ScoreBoard
     score_string
   end
   
-  def save
-    File.open('high_scores', 'w') do |f|
-      f.puts self.to_yaml
+  private
+  
+    def save
+      File.open('high_scores', 'w') do |f|
+        f.puts self.to_yaml
+      end
     end
-  end
 end
