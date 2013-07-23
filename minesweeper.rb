@@ -70,7 +70,7 @@ class Minesweeper
     if input.length == 2
       click_square(input)
     else
-      @board.toggle_flag(input[1..-1])
+      @board[input[1..-1]].toggle_flag
     end
   end
 
@@ -121,9 +121,9 @@ class Board
   def populate_grid
     all_positions.each do |pos|
       if @bomb_positions.include?(pos)
-        self[pos] = Tile.new(true, pos, self)
+        self[pos] = Tile.new(pos, self, true)
       else
-        self[pos] = Tile.new(false, pos, self)
+        self[pos] = Tile.new(pos, self, false)
       end
     end
 
@@ -170,86 +170,9 @@ class Board
     end
   end
 
-  def toggle_flag(pos)
-    tile = self[pos]
-    tile.flagged? ? tile.remove_flag : tile.flag
-  end
-
   def won?
     (all_positions - @bomb_positions).all? do |pos|
       self[pos].revealed?
     end
   end
 end
-
-# class Tile
-#   attr_reader :bomb_count, :position
-#   attr_accessor :bomb, :revealed
-# 
-#   def initialize(bomb = false, position, board)
-#     @bomb = bomb
-#     @flagged = false #delete?
-#     @revealed = false #delete?
-#     @position = position
-#     @board = board
-#     @bomb_count = 0
-#   end
-# 
-#   # Refactor later
-#   def adjacent_tiles
-#     directions = [[1, 1], [0, 1], [1, 0], [1, -1],
-#                   [0, -1], [-1, 1], [-1, 0], [-1, -1]]
-#     adjacent_tiles = []
-#     current_x = self.position.first
-#     current_y = self.position.last
-# 
-#     directions.each do |pos|
-#       x = pos.first
-#       y = pos.last
-# 
-#       new_pos = [current_x + x, current_y + y]
-# 
-#       if @board.on_board?(new_pos)
-#         adjacent_tiles << @board[[current_x + x, current_y + y]]
-#       end
-#     end
-# 
-#     adjacent_tiles
-#   end
-#   
-#   def bomb?
-#     @bomb
-#   end
-#   
-#   def calculate_bomb_count
-#     self.adjacent_tiles.each do |neighbor|
-#       @bomb_count += 1 if neighbor.bomb?
-#     end
-#   end
-# 
-#   def flag
-#     @flagged = true
-#   end
-# 
-#   def flagged?
-#     @flagged
-#   end
-# 
-#   def remove_flag
-#     @flagged = false
-#   end
-# 
-#   def revealed?
-#     @revealed
-#   end
-# 
-#   def reveal
-#     @revealed = true
-#   end
-# 
-#   def to_s
-#     bomb? ? '*' : @bomb_count.to_s
-#   end
-# 
-# 
-# end

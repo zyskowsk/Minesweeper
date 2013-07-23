@@ -1,8 +1,7 @@
 class Tile
   attr_reader :bomb_count, :position
-  attr_accessor :bomb, :revealed
 
-  def initialize(bomb = false, position, board)
+  def initialize(position, board, bomb = false)
     @bomb = bomb
     @flagged = false #delete?
     @revealed = false #delete?
@@ -11,7 +10,6 @@ class Tile
     @bomb_count = 0
   end
 
-  # Refactor later
   def adjacent_tiles
     adjacent_tiles = []
     directions = [[1, 1], [0, 1], 
@@ -45,30 +43,25 @@ class Tile
       @bomb_count += 1 if neighbor.bomb?
     end
   end
-
-  def flag
-    @flagged = true
-  end
-
+  
   def flagged?
     @flagged
   end
-
-  def remove_flag
-    @flagged = false
+  
+  def reveal
+    @revealed = true
   end
 
   def revealed?
     @revealed
   end
 
-  def reveal
-    @revealed = true
-  end
-
   def to_s
     bomb? ? '*' : @bomb_count.to_s
   end
-
-
+  
+  def toggle_flag
+    @flagged = !@flagged
+  end
+  
 end
