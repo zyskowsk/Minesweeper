@@ -55,6 +55,10 @@ class Tile
   def revealed?
     @revealed
   end
+  
+  def hidden?
+    !@revealed
+  end
 
   def to_s
     colors = {1 => :light_green,
