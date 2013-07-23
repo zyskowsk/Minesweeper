@@ -1,4 +1,5 @@
 require 'yaml'
+load './tile.rb'
 
 class Minesweeper
   attr_reader :board
@@ -107,6 +108,10 @@ class Board
 
     all_positions
   end
+  
+  def bomb_positions
+    all_positions.sample(10)
+  end
 
   def on_board?(pos)
     (0...9).include?(pos.first) && (0...9).include?(pos.last)
@@ -177,74 +182,74 @@ class Board
   end
 end
 
-class Tile
-  attr_reader :bomb_count, :position
-  attr_accessor :bomb, :revealed
-
-  def initialize(bomb = false, position, board)
-    @bomb = bomb
-    @flagged = false #delete?
-    @revealed = false #delete?
-    @position = position
-    @board = board
-    @bomb_count = 0
-  end
-
-  # Refactor later
-  def adjacent_tiles
-    directions = [[1, 1], [0, 1], [1, 0], [1, -1],
-                  [0, -1], [-1, 1], [-1, 0], [-1, -1]]
-    adjacent_tiles = []
-    current_x = self.position.first
-    current_y = self.position.last
-
-    directions.each do |pos|
-      x = pos.first
-      y = pos.last
-
-      new_pos = [current_x + x, current_y + y]
-
-      if @board.on_board?(new_pos)
-        adjacent_tiles << @board[[current_x + x, current_y + y]]
-      end
-    end
-
-    adjacent_tiles
-  end
-
-  def bomb?
-    @bomb
-  end
-
-  def calculate_bomb_count
-    self.adjacent_tiles.each do |neighbor|
-      @bomb_count += 1 if neighbor.bomb?
-    end
-  end
-
-  def flag
-    @flagged = true
-  end
-
-  def flagged?
-    @flagged
-  end
-
-  def remove_flag
-    @flagged = false
-  end
-
-  def revealed?
-    @revealed
-  end
-
-  def reveal
-    @revealed = true
-  end
-
-  def to_s
-    bomb? ? '*' : @bomb_count.to_s
-  end
-
-
-end
+# class Tile
+#   attr_reader :bomb_count, :position
+#   attr_accessor :bomb, :revealed
+# 
+#   def initialize(bomb = false, position, board)
+#     @bomb = bomb
+#     @flagged = false #delete?
+#     @revealed = false #delete?
+#     @position = position
+#     @board = board
+#     @bomb_count = 0
+#   end
+# 
+#   # Refactor later
+#   def adjacent_tiles
+#     directions = [[1, 1], [0, 1], [1, 0], [1, -1],
+#                   [0, -1], [-1, 1], [-1, 0], [-1, -1]]
+#     adjacent_tiles = []
+#     current_x = self.position.first
+#     current_y = self.position.last
+# 
+#     directions.each do |pos|
+#       x = pos.first
+#       y = pos.last
+# 
+#       new_pos = [current_x + x, current_y + y]
+# 
+#       if @board.on_board?(new_pos)
+#         adjacent_tiles << @board[[current_x + x, current_y + y]]
+#       end
+#     end
+# 
+#     adjacent_tiles
+#   end
+#   
+#   def bomb?
+#     @bomb
+#   end
+#   
+#   def calculate_bomb_count
+#     self.adjacent_tiles.each do |neighbor|
+#       @bomb_count += 1 if neighbor.bomb?
+#     end
+#   end
+# 
+#   def flag
+#     @flagged = true
+#   end
+# 
+#   def flagged?
+#     @flagged
+#   end
+# 
+#   def remove_flag
+#     @flagged = false
+#   end
+# 
+#   def revealed?
+#     @revealed
+#   end
+# 
+#   def reveal
+#     @revealed = true
+#   end
+# 
+#   def to_s
+#     bomb? ? '*' : @bomb_count.to_s
+#   end
+# 
+# 
+# end
