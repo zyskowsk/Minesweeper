@@ -8,6 +8,17 @@ require './scoreboard.rb'
 
 class Minesweeper
   attr_reader :board
+  
+  def self.load(file)
+    file_contents = File.read(file)
+    game = YAML.load(file_contents)
+    game.play
+  end
+  
+  def self.load_high_scores
+    high_scores = File.read("high_scores")
+    YAML.load(high_scores)
+  end
 
   def initialize(size)
     @board = Board.new(size)
@@ -27,6 +38,25 @@ class Minesweeper
     else
       @board.reveal_neighbors(pos)
     end
+  end
+  
+  def get_coordinates(input)
+    pos = input.length == 3 ? input[-2..-1] : input
+    pos.map(&:to_i)
+  end
+  
+  def get_input
+    puts ("=" * 34).colorize(:blue)
+    puts "Type x y to click square (ex. 3 1)".colorize(:magenta)
+    puts "or type 'F x y' to flag a position".colorize(:magenta)
+    input = gets.chomp.split(' ')
+    
+    until valid_move?(input)
+      puts "Not a valid move; please try again!".colorize(:magenta)
+      input = gets.chomp.split(' ')
+    end
+
+    input
   end
   
   def get_input_string(input)
@@ -55,36 +85,6 @@ class Minesweeper
     time = finish - start
     p @high_scores
     @high_scores.add_score(time)
-  end
-
-  def get_coordinates(input)
-    pos = input.length == 3 ? input[-2..-1] : input
-    pos.map(&:to_i)
-  end
-  
-  def get_input
-    puts ("=" * 34).colorize(:blue)
-    puts "Type x y to click square (ex. 3 1)".colorize(:magenta)
-    puts "or type 'F x y' to flag a position".colorize(:magenta)
-    input = gets.chomp.split(' ')
-    
-    until valid_move?(input)
-      puts "Not a valid move; please try again!".colorize(:magenta)
-      input = gets.chomp.split(' ')
-    end
-
-    input
-  end
-
-  def self.load(file)
-    file_contents = File.read(file)
-    game = YAML.load(file_contents)
-    game.play
-  end
-  
-  def self.load_high_scores
-    high_scores = File.read("high_scores")
-    YAML.load(high_scores)
   end
 
   def play_turn(input)
