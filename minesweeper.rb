@@ -37,6 +37,8 @@ class Minesweeper
       puts @board
       input = get_input
       
+      return if input.first.downcase == 'quit'
+      
       if input.first.downcase == 'save'
         save_game
         puts "Game saved!"
@@ -53,12 +55,13 @@ class Minesweeper
   end
   
   def get_input
-    puts "What square do you want to reveal?"
-    puts "Or type 'F x y' to flag a position."
+    puts ("=" * 34).colorize(:blue)
+    puts "Type x y to click square (ex. 3 1)".colorize(:magenta)
+    puts "or type 'F x y' to flag a position".colorize(:magenta)
     input = gets.chomp.split(' ')
     
     until valid_move?(input)
-      puts "Not a valid move; please try again!"
+      puts "Not a valid move; please try again!".colorize(:magenta)
       input = gets.chomp.split(' ')
     end
 
@@ -86,7 +89,8 @@ class Minesweeper
   end
   
   def valid_move?(input)
-    return input if input.first.downcase == 'save'
+    leave_game = (input.first == 'quit' || input.first == 'save')
+    return input if leave_game
     coordinates = get_coordinates(input)
     (2..3).include?(input.length) &&
     @board.on_board?(coordinates) &&
@@ -94,10 +98,10 @@ class Minesweeper
   end
   
   def welcom_message
-    puts "=" * 31
-    puts "Welcome to Minesweeper!"
-    puts "To save your game, enter 'save.'"
-    puts "=" * 31
+    puts ("=" * 34).colorize(:blue)
+    puts "Welcome to Minesweeper!".colorize(:magenta)
+    puts "To save your game, enter 'save.'".colorize(:magenta)
+    puts ("=" * 34).colorize(:blue)
   end
 end
 

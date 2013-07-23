@@ -78,7 +78,7 @@ class Board
     rows_string = ""
     
     stringify_tiles.each_with_index do |row, i|
-      rows_string += "#{i} ".colorize(:cyan) + row.join(" ") + "\n"
+      rows_string += (" " * 6) + "#{i} ".colorize(:cyan) + row.join(" ") + "\n"
     end
     
     rows_string  
@@ -108,7 +108,7 @@ class Board
       top_row += " #{i}".colorize(:cyan) 
     end
     
-    " " + top_row + "\n"
+    (" " * 7) + top_row + "\n"
   end
 
   def won?
