@@ -1,7 +1,9 @@
+#!/usr/bin/env ruby
+
 require 'yaml'
 require 'colorize'
-load './tile.rb'
-load './board.rb'
+require './tile.rb'
+require './board.rb'
 
 class Minesweeper
   attr_reader :board
@@ -97,4 +99,9 @@ class Minesweeper
     puts "To save your game, enter 'save.'"
     puts "=" * 31
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  game = Minesweeper.new
+  game.play
 end
