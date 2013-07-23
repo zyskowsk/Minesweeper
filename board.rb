@@ -90,7 +90,7 @@ class Board
         if elem.revealed?
           elem.to_s
         elsif elem.flagged?
-          "F"
+          "F".colorize(:red)
         else
           "▨"
         end
