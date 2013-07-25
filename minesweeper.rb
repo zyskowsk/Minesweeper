@@ -2,9 +2,9 @@
 
 require 'yaml'
 require 'colorize'
-require './tile.rb'
-require './board.rb'
-require './scoreboard.rb'
+load './tile.rb'
+load './board.rb'
+load './scoreboard.rb'
 
 class Minesweeper
   attr_reader :board
