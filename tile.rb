@@ -20,7 +20,7 @@ class Tile
   def adjacent_tiles
     adjacent_tiles = []
     DIRECTIONS.each do |direction|
-      adjacent_position = adjacent_tile(direction)
+      adjacent_position = adjacent_position(direction)
       if @board.on_board?(adjacent_position)
         adjacent_tiles << @board[adjacent_position]
       end
@@ -29,7 +29,7 @@ class Tile
     adjacent_tiles
   end
   
-  def adjacent_tile(dir)
+  def adjacent_position(dir)
     x, y, dx, dy = @pos + dir 
     [x + dx, y + dy]
   end
