@@ -1,5 +1,6 @@
 class Tile
-  attr_reader :bomb_count, :pos
+  attr_reader :bomb_count, :pos, :bomb
+  alias :bomb? :bomb
   
   DIRECTIONS = [[1, 1], 
                 [0, 1], 
@@ -17,25 +18,16 @@ class Tile
     @bomb_count = 0
   end
 
-  def adjacent_tiles
-    adjacent_tiles = []
-    DIRECTIONS.each do |direction|
-      adjacent_position = adjacent_position(direction)
-      if @board.on_board?(adjacent_position)
-        adjacent_tiles << @board[adjacent_position]
-      end
+  def adjacent_positions
+    DIRECTIONS.map do |(dx, dy)|
+      [@pos[0] + dx, @pos[1] + dy]
+    end.select do |pos|
+      @board.on_board?(pos)
     end
-
-    adjacent_tiles
   end
   
-  def adjacent_position(dir)
-    x, y, dx, dy = @pos + dir 
-    [x + dx, y + dy]
-  end
-  
-  def bomb?
-    @bomb
+  def adjacent_tiles
+    adjacent_positions.map { |pos| @board[pos] }
   end
   
   def calculate_bomb_count
