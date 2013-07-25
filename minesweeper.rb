@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+
+# TODO: finish refactoring board, scoreboard, highscores
+# TODO: fix to_s, implement proper flagging, highscores.
+
 require 'yaml'
 require 'colorize'
 load './tile.rb'
@@ -26,43 +30,6 @@ class Minesweeper
     @high_scores = high_scores ? high_scores : ScoreBoard.new
   end
 
-  def click_square(pos)
-    if @board[pos].bomb?
-      @board.reveal_all
-      puts "You lost!"
-      puts @board
-    elsif @board.won?
-      puts "You Won!"
-      @board.reveal_all
-      puts @board
-    else
-      @board.reveal_neighbors(pos)
-    end
-  end
-  
-  def get_coordinates(input)
-    pos = input.length == 3 ? input[-2..-1] : input
-    pos.map(&:to_i)
-  end
-  
-  def get_input
-    puts ("=" * 34).colorize(:blue)
-    puts "Type x y to click square (ex. 3 1)".colorize(:magenta)
-    puts "or type 'F x y' to flag a position".colorize(:magenta)
-    input = gets.chomp.split(' ')
-    
-    until valid_move?(input)
-      puts "Not a valid move; please try again!".colorize(:magenta)
-      input = gets.chomp.split(' ')
-    end
-
-    input
-  end
-  
-  def get_input_string(input)
-    return input.first if input.length == 3
-  end
-
   def play
     welcome_message
 
@@ -86,15 +53,7 @@ class Minesweeper
     p @high_scores
     @high_scores.add_score(time)
   end
-
-  def play_turn(input)
-    if input.length == 2
-      click_square(get_coordinates(input))
-    else
-      @board[get_coordinates(input)].toggle_flag
-    end
-  end
-
+  
   def save_game
     File.open("#{DateTime.now.strftime("%a-%b-%e-%H-%M-%S")}", 'w') do |f|
       f.puts self.to_yaml
@@ -110,12 +69,45 @@ class Minesweeper
     @board[coordinates].hidden? 
   end
   
-  def welcome_message
-    puts ("=" * 34).colorize(:blue)
-    puts "Welcome to Minesweeper!".colorize(:magenta)
-    puts "To save your game, enter 'save.'".colorize(:magenta)
-    puts ("=" * 34).colorize(:blue)
-  end
+  private
+  
+    def click_square(pos)
+      if @board[pos].bomb?
+        @board.reveal_all
+        puts "You lost!"
+        puts @board
+      elsif @board.won?
+        puts "You Won!"
+        @board.reveal_all
+        puts @board
+      else
+        @board.reveal_neighbors(pos)
+      end
+    end
+
+    def get_coordinates(input)
+      pos = input.length == 3 ? input[-2..-1] : input
+      pos.map(&:to_i)
+    end
+
+    def get_input_string(input)
+      return input.first if input.length == 3
+    end
+
+    def play_turn(input)
+      if input.length == 2
+        click_square(get_coordinates(input))
+      else
+        @board[get_coordinates(input)].toggle_flag
+      end
+    end
+ 
+    def welcome_message
+      puts ("=" * 34).colorize(:blue)
+      puts "Welcome to Minesweeper!".colorize(:magenta)
+      puts "To save your game, enter 'save.'".colorize(:magenta)
+      puts ("=" * 34).colorize(:blue)
+    end
 end
 
 if __FILE__ == $PROGRAM_NAME

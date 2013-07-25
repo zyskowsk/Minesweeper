@@ -25,7 +25,6 @@ class ScoreBoard
   end
   
   private
-  
     def save
       File.open('high_scores', 'w') do |f|
         f.puts self.to_yaml
