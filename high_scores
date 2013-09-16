@@ -1,8 +1,23 @@
 --- !ruby/object:ScoreBoard
 high_scores:
+- - 4.23
+  - !binary |-
+    G1tB
 - - 8.64
+  - Rob
+- - 11.94
+  - !binary |-
+    G1tB
+- - 14.47
+  - Peter
+- - 28.78
   - Rob
 - - 43.96
   - Rob
+- - 126.68
+  - Rob
+- - 211.85
+  - !binary |-
+    G1tB
 - - 357.53
   - 'Rob '
